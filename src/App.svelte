@@ -3,9 +3,12 @@
   import viteLogo from "/vite.svg";
   import Counter from "./components/Counter.svelte";
   import Editor from "./components/Editor.svelte";
-  import type { EditorImpl } from "@lib/editor";
+  import { SpeechCapture } from "./lib/speech";
+  import type { EditorImpl } from "./lib/editor";
 
   let editor: EditorImpl;
+  SpeechCapture.init();
+  SpeechCapture.listenForWord(console.log);
 </script>
 
 <main>
