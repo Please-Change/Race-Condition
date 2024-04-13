@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+@font-face {
+    font-family: "Fixed Sys";
+    src:
+        url("/font/fixedsys.woff2") format("woff2"),
+        url("/font/fixedsys.ttf") format("ttf");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
