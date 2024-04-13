@@ -6,22 +6,42 @@ const ALLOWED_LETTERS =
 
 export class LetterBottle extends PowerUpBottle {
   public letters: string[];
+  private listenFunc: (e: KeyboardEvent) => void;
 
-  constructor(isForMe: boolean, powerUp: PowerUp, xpos: number) {
-    super(isForMe, powerUp, xpos);
+  constructor(isForMe: boolean, powerUp: PowerUp) {
+    super(isForMe, powerUp);
 
     this.letters = [];
+    const numOfLetters = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < numOfLetters; i++) {
+      this.letters.push(randomLetter());
+    }
+
+    this.listenFunc = e => {
+      if (this.letters.length > 0) {
+        const next = this.letters[0];
+        if (e.key === next) {
+          this.letters.shift();
+          if (this.letters.length === 0) this.snatched = true;
+        }
+      }
+    };
   }
 
-  public update(): boolean {
-    this.position[1]++;
-    return this.position[1] >= window.innerHeight || this.snatched;
+  public init() {
+    window.addEventListener("keyup", this.listenFunc);
   }
 
-  public init() {}
-  public destroy() {}
-
-  public icon(): string {
-    return this.powerUp.icon();
+  public destroy() {
+    window.removeEventListener("keyup", this.listenFunc);
   }
+
+  public label(): string {
+    return this.letters.join(" ");
+  }
+}
+
+function randomLetter() {
+  const i = Math.floor(Math.random() * (ALLOWED_LETTERS.length - 1));
+  return ALLOWED_LETTERS[i];
 }

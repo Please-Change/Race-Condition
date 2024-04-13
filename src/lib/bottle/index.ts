@@ -6,11 +6,13 @@ export class PowerUpBottle {
   public position: [number, number];
   public snatched: boolean;
 
-  constructor(isForMe: boolean, powerUp: PowerUp, xpos: number) {
+  constructor(isForMe: boolean, powerUp: PowerUp) {
     this.isForMe = isForMe;
     this.powerUp = powerUp;
-    this.position = [xpos, 0];
     this.snatched = false;
+
+    const xpos = Math.floor(Math.random() * (window.innerHeight - 20)) + 20;
+    this.position = [xpos, 0];
   }
 
   public update(): boolean {
@@ -20,6 +22,11 @@ export class PowerUpBottle {
 
   public init() {}
   public destroy() {}
+  public onClick() {}
+
+  public label(): string {
+    return "";
+  }
 
   public icon(): string {
     return this.powerUp.icon();

@@ -2,24 +2,18 @@
   import svelteLogo from "./assets/svelte.svg";
   import viteLogo from "/vite.svg";
   import Counter from "./components/Counter.svelte";
-  import Editor from "./components/Editor.svelte";
+  import GameEditor from "./components/GameEditor.svelte";
   import { SpeechCapture } from "./lib/speech";
-  import type { EditorImpl } from "./lib/editor";
+  import { Game } from "./lib/game";
 
-  let editor: EditorImpl;
   SpeechCapture.init();
   SpeechCapture.listenForWord(console.log);
+
+  const game = new Game("typescript");
+  game.init().catch(console.error);
 </script>
 
 <main>
   <h2 class="font-brand text-2xl font-bold">Race Condition</h2>
-  <Editor
-    language="typescript"
-    initDocument={[
-      "function hello() {",
-      "  console.log('hello world');",
-      "}",
-    ].join("\n")}
-    bind:editor
-  />
+  <GameEditor editor={game.editor} />
 </main>

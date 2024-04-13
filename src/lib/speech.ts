@@ -1,17 +1,3 @@
-export const ALLOWED_WORDS = [
-  "banana",
-  "apple",
-  "fuck",
-  "you",
-  "myself",
-  "orange",
-  "accessory",
-  "anemone",
-  "choir",
-  "February",
-  "onomatopoeia",
-];
-
 export class SpeechCapture {
   static nextId = 0;
   static recognition: any;
