@@ -1,4 +1,4 @@
-import type { EditorImpl } from "@lib/editor";
+import type { EditorImpl } from "@lib/EditorImpl";
 
 export class PowerUp {
   public apply(_editor: EditorImpl) {}
