@@ -1,9 +1,9 @@
-import type { EditorImpl } from "@lib/EditorImpl";
+import type { Game } from "@lib/game";
 
 export class PowerUp {
-  public apply(_editor: EditorImpl) {}
+  public apply(_: Game) {}
 
-  public update(_editor: EditorImpl): boolean {
+  public update(_: Game): boolean {
     return true;
   }
 
@@ -15,7 +15,7 @@ export class PowerUp {
     return PowerUpType.None;
   }
 
-  public destroy(_editor: EditorImpl) {}
+  public destroy(_: Game) {}
 
   public icon(): string {
     return "";
