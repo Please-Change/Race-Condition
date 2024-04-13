@@ -1,43 +1,105 @@
 <script lang="ts">
-  import { Game } from "./lib/game";
-  import GameEditor from "./components/GameEditor.svelte";
-  import { SpeechCapture } from "./lib/speech";
-  import { Client } from "./lib/socketing";
-  import Bottle from "./components/Bottle.svelte";
-  import SvelteMarkdown from "svelte-markdown";
-  import { derived, writable } from "svelte/store";
-
-  SpeechCapture.init();
-  // SpeechCapture.listenForWord(console.log);
+  import svelteLogo from "./assets/svelte.svg";
+  import viteLogo from "/vite.svg";
+  import Counter from "./components/Counter.svelte";
+  import Game from "./components/Game.svelte";
+  import { Action, Client, GameStatus, ReadyStatus } from "./lib/socketing";
+  import { Language, Problem, type Settings } from "./lib/types";
 
   const ws = new Client("ws://localhost:5174");
 
-  const treeToString = writable("");
+  let playerCount = 0;
+  let status = ReadyStatus.Waiting;
+  let gameStatus = GameStatus.Pending;
 
-  const game = new Game(ws, "javascript");
-  game.init().then(async () => {
-    console.log("Loaded GAME!");
-    game.tree.subscribe(tree => {
-      treeToString.set(tree.rootNode.toString());
-    });
+  let settings: Settings = {
+    language: Language.JavaScript,
+    problem: Problem.FizzBuzz,
+  };
+
+  ws.addListener(message => {
+    switch (message.action) {
+      case Action.PlayerCountUpdate:
+        playerCount = message.data;
+        break;
+      case Action.StatusChanged:
+        if (status === ReadyStatus.Ready || status === ReadyStatus.Active) {
+          gameStatus = message.data.status;
+          if (gameStatus === GameStatus.Active) {
+            status = ReadyStatus.Active;
+          }
+        }
+        break;
+      case Action.ChangeReady:
+        status = message.data;
+        break;
+      case Action.ChangeSettings:
+        settings = message.data;
+        break;
+    }
   });
-  const bottles = game.bottles;
-  (window as any).game = game;
+
+  function joinMatch() {
+    status = ReadyStatus.Ready;
+    ws.send({ action: Action.ChangeReady, data: ReadyStatus.Ready });
+  }
+
+  function startMatch() {
+    ws.send({
+      action: Action.StatusChanged,
+      data: { status: GameStatus.Active },
+    });
+  }
+
+  function updateSettings() {
+    ws.send({
+      action: Action.ChangeSettings,
+      data: settings,
+    });
+  }
 </script>
 
 <main class="w-screen h-screen p-0 m-0 bg-black text-white flex flex-col">
-  {#each $bottles as b}
-    <Bottle bottle={b} />
-  {/each}
-  <h2 class="font-brand text-2xl font-bold ml-16">Race Condition</h2>
-  <div class="grid grid-cols-2 w-full flex-grow">
-    <div class="h-full w-full relative">
-      <GameEditor editor={game.editor} />
+  <h2 class="font-brand text-2xl font-bold">Race Condition</h2>
+  {#if status === ReadyStatus.Waiting}
+    <div class="ml-6">
+      <button
+        on:click={joinMatch}
+        class="font-brand text-xl border border-white rounded-md p-2 mt-2"
+        >Join match</button
+      >
     </div>
-    <article
-      class="p-2 prose prose-headings:m-0 prose-headings:font-brand prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:text-white prose-invert"
-    >
-      <SvelteMarkdown source={$treeToString} />
-    </article>
-  </div>
+  {:else if status === ReadyStatus.Ready}
+    <div class="ml-6">
+      <h3 class="font-brand text-xl">{playerCount} active players</h3>
+      <div>
+        <select
+          bind:value={settings.language}
+          on:change={updateSettings}
+          class="rounded-md border border-white p-2 w-48 font-brand text-lg bg-black"
+        >
+          {#each Object.values(Language) as lang}
+            <option value={lang}>{lang}</option>
+          {/each}
+        </select>
+
+        <select
+          bind:value={settings.problem}
+          on:change={updateSettings}
+          class="rounded-md border border-white p-2 w-48 font-brand text-lg bg-black"
+        >
+          {#each Object.values(Problem) as prob}
+            <option value={prob}>{prob}</option>
+          {/each}
+        </select>
+      </div>
+      <button
+        on:click={startMatch}
+        class="font-brand text-xl border border-white rounded-md p-2 mt-2"
+        >Start match</button
+      >
+    </div>
+  {:else}
+    <Game {ws} language={Language.JavaScript} problem={Problem.FizzBuzz} />
+  {/if}
 </main>
