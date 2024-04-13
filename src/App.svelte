@@ -5,11 +5,14 @@
   import GameEditor from "./components/GameEditor.svelte";
   import { SpeechCapture } from "./lib/speech";
   import { Game } from "./lib/game";
+  import { Client } from "./lib/socketing";
 
   SpeechCapture.init();
   SpeechCapture.listenForWord(console.log);
 
-  const game = new Game("typescript");
+  const ws = new Client("ws://localhost:5174");
+
+  const game = new Game(ws, "typescript");
   game.init().catch(console.error);
 </script>
 

@@ -1,4 +1,4 @@
-import type { PowerUp } from "@lib/powerup";
+import type { PowerUpType } from "@lib/powerup";
 import { PowerUpBottle } from ".";
 
 const ALLOWED_LETTERS =
@@ -8,7 +8,7 @@ export class LetterBottle extends PowerUpBottle {
   public letters: string[];
   private listenFunc: (e: KeyboardEvent) => void;
 
-  constructor(isForMe: boolean, powerUp: PowerUp) {
+  constructor(isForMe: boolean, powerUp: PowerUpType) {
     super(isForMe, powerUp);
 
     this.letters = [];

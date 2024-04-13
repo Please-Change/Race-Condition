@@ -1,4 +1,4 @@
-import type { PowerUp } from "@lib/powerup";
+import type { PowerUpType } from "@lib/powerup";
 import { PowerUpBottle } from ".";
 import { SpeechCapture } from "../speech";
 
@@ -21,7 +21,7 @@ export class SpeechBottle extends PowerUpBottle {
   public words: string[];
   private listenId: number | undefined;
 
-  constructor(isForMe: boolean, powerUp: PowerUp) {
+  constructor(isForMe: boolean, powerUp: PowerUpType) {
     super(isForMe, powerUp);
 
     this.words = [];

@@ -1,12 +1,12 @@
-import type { PowerUp } from "@lib/powerup";
+import type { PowerUpType } from "@lib/powerup";
 
 export class PowerUpBottle {
   public isForMe: boolean;
-  public powerUp: PowerUp;
+  public powerUp: PowerUpType;
   public position: [number, number];
   public snatched: boolean;
 
-  constructor(isForMe: boolean, powerUp: PowerUp) {
+  constructor(isForMe: boolean, powerUp: PowerUpType) {
     this.isForMe = isForMe;
     this.powerUp = powerUp;
     this.snatched = false;
@@ -29,6 +29,8 @@ export class PowerUpBottle {
   }
 
   public icon(): string {
-    return this.powerUp.icon();
+    // return this.powerUp.icon();
+    // TODO
+    return "";
   }
 }

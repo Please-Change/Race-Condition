@@ -22,6 +22,8 @@ export class PowerUp {
   }
 }
 
+// Alphabetically sorted variable names
+
 export enum PowerUpType {
   None,
   VoiceToText,
