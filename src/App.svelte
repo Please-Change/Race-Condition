@@ -1,22 +1,39 @@
 <script lang="ts">
-  import svelteLogo from "./assets/svelte.svg";
-  import viteLogo from "/vite.svg";
-  import Counter from "./components/Counter.svelte";
+  import { Game } from "./lib/game";
   import GameEditor from "./components/GameEditor.svelte";
   import { SpeechCapture } from "./lib/speech";
-  import { Game } from "./lib/game";
   import { Client } from "./lib/socketing";
+  import SvelteMarkdown from "svelte-markdown";
+  import { derived, writable } from "svelte/store";
 
   SpeechCapture.init();
-  SpeechCapture.listenForWord(console.log);
+  // SpeechCapture.listenForWord(console.log);
 
   const ws = new Client("ws://localhost:5174");
 
-  const game = new Game(ws, "typescript");
-  game.init().catch(console.error);
+  const treeToString = writable("");
+
+  const game = new Game(ws, "javascript");
+  game.init().then(async () => {
+    console.log("Loaded GAME!")
+    game.tree.subscribe((tree) => {
+      treeToString.set(tree.rootNode.toString());
+    })
+  });
+  (window as any).game = game;
 </script>
 
-<main>
+
+<main class="w-screen h-screen p-0 m-0 bg-black text-white flex flex-col">
   <h2 class="font-brand text-2xl font-bold">Race Condition</h2>
-  <GameEditor editor={game.editor} />
+  <div class="grid grid-cols-2 w-full flex-grow">
+    <div class="h-full w-full relative">
+    <GameEditor editor={game.editor} />
+    </div>
+    <article
+      class="p-2 prose prose-headings:m-0 prose-headings:font-brand prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:text-white prose-invert"
+    >
+      <SvelteMarkdown source={$treeToString}/>
+    </article>
+  </div>
 </main>

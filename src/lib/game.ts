@@ -1,25 +1,32 @@
-import { EditorImpl } from "./editor";
 import { PowerUp, PowerUpType } from "./powerup";
 import type { PowerUpBottle } from "./bottle";
+import { EditorImpl } from "./EditorImpl";
 import { SpeechBottle } from "./bottle/speechRequired";
 import { Action, GameStatus, type Client, type Message } from "./socketing";
 import { createPowerUp } from "./powerup/create";
+import { StaticAnalysis } from "./analyze";
+import Parser from "web-tree-sitter";
+import { writable, type Readable, type Writable, derived, readonly, get } from "svelte/store";
 
 export class Game {
   public editor: EditorImpl;
+  private language: Writable<StaticAnalysis.Language>;
+  private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
+  public tree: Readable<Parser.Tree> = undefined as unknown as Readable<Parser.Tree>;
+
   public submitError: string;
   public submitting: boolean;
 
-  private language: string;
   private powerUps: PowerUp[];
   private bottles: PowerUpBottle[];
   private running: boolean;
   private client: Client;
   private wsListenerId: number | undefined;
 
-  constructor(ws: Client, startLanguage: string) {
+  constructor(ws: Client, startLanguage: StaticAnalysis.Language) {
+
     this.editor = new EditorImpl();
-    this.language = startLanguage;
+    this.language = writable(startLanguage);
     this.powerUps = [];
     this.bottles = [];
     this.running = true;
@@ -31,7 +38,22 @@ export class Game {
   }
 
   public async init() {
-    await this.editor.init(this.language, "");
+    await this.editor.init(this.language);
+    await StaticAnalysis.init();
+    const _parser = writable(await StaticAnalysis.forLanguage(get(this.language)));
+
+    this.language.subscribe(lang => {
+      StaticAnalysis.forLanguage(lang)
+        .then(parser => _parser.set(parser))
+    });
+
+    this.parser = readonly(_parser);
+    this.tree = derived([this.editor.sourceCode, this.parser], ([lines, parser]) => parser.parse((_, position) => {
+      let line = lines[position!.row];
+      if (line) return line.slice(position!.column);
+      return "";
+    }));
+
     window.requestAnimationFrame(() => {
       this.loop();
     });
@@ -105,7 +127,7 @@ export class Game {
       this.submitError = "";
       this.client.send({
         action: Action.Submit,
-        data: this.editor.editor.getValue(),
+        data: get(this.editor.sourceCode).join("\n"),
       });
     }
   }
@@ -142,5 +164,16 @@ export class Game {
         this.loop();
       });
     }
+  }
+
+
+  /// DEBUG
+
+  public _tree() {
+    return get(this.tree);
+  }
+  
+  public _setLanguage(lang: StaticAnalysis.Language) {
+    return this.language.set(lang);
   }
 }

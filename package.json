@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "@tailwindcss/typography": "^0.5.12",
     "@tsconfig/svelte": "^5.0.2",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
@@ -19,11 +20,21 @@
     "svelte": "^4.2.12",
     "svelte-check": "^3.6.7",
     "tailwindcss": "^3.4.3",
+    "tree-sitter-c": "^0.21.0",
+    "tree-sitter-cli": "^0.22.4",
+    "tree-sitter-cpp": "^0.21.0",
+    "tree-sitter-go": "^0.21.0",
+    "tree-sitter-javascript": "^0.21.0",
+    "tree-sitter-python": "^0.21.0",
+    "tree-sitter-rust": "^0.21.0",
+    "tree-sitter-typescript": "^0.20.5",
     "tslib": "^2.6.2",
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
   },
   "dependencies": {
-    "monaco-editor": "^0.47.0"
+    "monaco-editor": "^0.47.0",
+    "svelte-markdown": "^0.4.1",
+    "web-tree-sitter": "^0.22.4"
   }
 }
