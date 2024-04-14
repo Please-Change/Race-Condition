@@ -42,6 +42,5 @@ export enum PowerUpType {
   FullReset = "Reset",
   Blinded = "Blind",
   BadTrip = "RandomLocation",
-  Hints = "Hint",
   NoShortcuts = "NoShortcut",
 }
