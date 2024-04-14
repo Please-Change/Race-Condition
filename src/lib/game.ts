@@ -12,7 +12,6 @@ import {
   type Readable,
   type Writable,
   derived,
-  readonly,
   get,
 } from "svelte/store";
 import type { Language, Problem } from "./types";
@@ -55,7 +54,7 @@ export class Game {
 
   private problem: Problem;
   public powerUps: Writable<PowerUp[]> = writable([]);
-  public bottles: Writable<PowerUpBottle[]> = writable([]);;
+  public bottles: Writable<PowerUpBottle[]> = writable([]);
   public state: State;
   private client: Client;
   private wsListenerId: number | undefined;
@@ -68,7 +67,7 @@ export class Game {
     this.problem = problem;
     this.state = State.Building;
     this.problem = problem;
-    
+
     this.submitError = "";
     this.powerUpCountdown = 0;
 
@@ -108,15 +107,15 @@ export class Game {
       ([lines, parser]) => parser.parse(lines.join("\n")),
     );
 
-    this.variables = derived([this.tree, this.language, this.tsLanguage], ([tree, language, tsLanguage]) =>
-      _.uniqBy(
-        StaticAnalysis.variables(
-          language,
-          tsLanguage,
-          tree,
-        ).map(a => a.captures[0].node),
-        node => node.text,
-      ),
+    this.variables = derived(
+      [this.tree, this.language, this.tsLanguage],
+      ([tree, language, tsLanguage]) =>
+        _.uniqBy(
+          StaticAnalysis.variables(language, tsLanguage, tree).map(
+            a => a.captures[0].node,
+          ),
+          node => node.text,
+        ),
     );
 
     const forVariablePowerUps = derived(
@@ -149,7 +148,7 @@ export class Game {
     // const bottle = new SpeechBottle(false, PowerUpType.BadTrip);
     // this.addBottle(bottle);
     // console.log(bottle.label());
-    this.addPowerUp(PowerUpType.NoShortcuts);
+    // this.addPowerUp(PowerUpType.LightMode);
   }
 
   public destroy() {
@@ -166,13 +165,15 @@ export class Game {
   }
 
   public update() {
-    this.powerUps.update(ps => ps.filter(p => {
-      if (p.update(this)) {
-        p.destroy(this);
-        return false;
-      }
-      return true;
-    }));
+    this.powerUps.update(ps =>
+      ps.filter(p => {
+        if (p.update(this)) {
+          p.destroy(this);
+          return false;
+        }
+        return true;
+      }),
+    );
 
     this.markers = [];
     this.powerUps.update(powerUps =>
@@ -335,27 +336,27 @@ export class Game {
   public _changeLanguage() {
     let a = new ChangeProgrammingLanguage();
     a.apply(this);
-    this.powerUps.update((ar) => [...ar, a]);
+    this.powerUps.update(ar => [...ar, a]);
   }
 
   public _applyExiled() {
     let a = new ExiledVariables();
     a.apply(this);
-    this.powerUps.update((ar) => [...ar, a]);
+    this.powerUps.update(ar => [...ar, a]);
   }
   public _appltDistancing() {
     let a = new SocialDistancing();
     a.apply(this);
-    this.powerUps.update((ar) => [...ar, a]);
+    this.powerUps.update(ar => [...ar, a]);
   }
   public _characterSwap() {
     let a = new CharacterSwap();
     a.apply(this);
-    this.powerUps.update((ar) => [...ar, a]);
+    this.powerUps.update(ar => [...ar, a]);
   }
   public _swapTabsSpaces() {
     let a = new SwapTabsSpaces();
     a.apply(this);
-    this.powerUps.update((ar) => [...ar, a]);
+    this.powerUps.update(ar => [...ar, a]);
   }
 }

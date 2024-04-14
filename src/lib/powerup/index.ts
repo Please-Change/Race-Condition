@@ -1,11 +1,11 @@
 import type { Game } from "@lib/game";
 
 export class PowerUp {
-  public id: number;
+  public id: string;
   private static nextId = 0;
 
   constructor() {
-    this.id = PowerUp.nextId;
+    this.id = `powerup-${PowerUp.nextId}-${Math.floor(Math.random() * 1000)}`;
     PowerUp.nextId++;
   }
 
@@ -19,7 +19,6 @@ export class PowerUp {
   }
 
   public type(): PowerUpType {
-    return PowerUpType.BadTrip;
     throw new Error("Apples");
   }
 

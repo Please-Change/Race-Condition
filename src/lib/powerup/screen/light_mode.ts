@@ -4,17 +4,12 @@
 //   - Invert theam
 
 import { Game } from "@lib/game";
-import { PowerUp, PowerUpType } from ".";
-import { get } from "svelte/store";
+import { PowerUp, PowerUpType } from "..";
 
 export class LightMode extends PowerUp {
   public apply(game: Game) {
-    const Monaco = game.editor.Monaco!
-    Monaco.editor.setTheme("hc-light")
-    let main = document.querySelector("main")!
-    array.forEach(element => main.children{
-        element.
-    });
+    const Monaco = game.editor.Monaco!;
+    Monaco.editor.setTheme("hc-light");
   }
 
   public type(): PowerUpType {
@@ -22,8 +17,8 @@ export class LightMode extends PowerUp {
   }
 
   public destroy(game: Game) {
-    const Monaco = game.editor.Monaco!
-    Monaco.editor.setTheme("vs")
+    const Monaco = game.editor.Monaco!;
+    Monaco.editor.setTheme("vs");
   }
 
   public icon(): string {
