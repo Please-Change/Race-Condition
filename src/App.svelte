@@ -12,6 +12,9 @@
   let status = ReadyStatus.Waiting;
   let gameStatus = GameStatus.Pending;
 
+  // let status = ReadyStatus.Active;
+  // let gameStatus = GameStatus.Active;
+
   let settings: Settings = {
     language: Language.JavaScript,
     problem: Problem.FizzBuzz,
