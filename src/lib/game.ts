@@ -237,7 +237,7 @@ export class Game {
     const options = Object.values(PowerUpType);
     const type = options[Math.floor(Math.random() * options.length)];
 
-    const forMe = true || Math.random() < 0.25;
+    const forMe = Math.random() < 0.25;
     const thing = Math.floor(Math.random() * 3);
     let bottle: PowerUpBottle;
     if (thing === 0) {
