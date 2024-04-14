@@ -99,32 +99,32 @@ export class Game {
     this.state = State.Running;
     this.parser = derived(_parser, ([, p]) => p);
     this.tsLanguage = derived(_parser, ([l]) => l);
+
     this.tree = derived(
       [this.editor.sourceCode, this.parser],
       ([lines, parser]) => parser.parse(lines.join("\n")),
     );
 
-    this.variables = derived(this.tree, tree =>
+    this.variables = derived([this.tree, this.language, this.tsLanguage], ([tree, language, tsLanguage]) =>
       _.uniqBy(
         StaticAnalysis.variables(
-          get(this.language),
-          get(this.tsLanguage),
+          language,
+          tsLanguage,
           tree,
         ).map(a => a.captures[0].node),
         node => node.text,
       ),
     );
 
-    const a = derived(
+    const forVariablePowerUps = derived(
       [this.variables, this.powerUps, this.editor.editor] as const,
       ([_, powerUps, editor]) => {
         return [powerUps, editor] as const;
       },
     );
 
-    a.subscribe(([powerUps, editor]) => {
+    forVariablePowerUps.subscribe(([powerUps, editor]) => {
       powerUps.filter(isVariableBased).forEach(p => p.update(this));
-
       const Monaco = this.editor.Monaco!;
       Monaco.editor.setModelMarkers(
         editor!.getModel()!,
@@ -319,6 +319,9 @@ export class Game {
 
   public _tree() {
     return get(this.tree);
+  }
+  public _powerUps() {
+    return get(this.powerUps);
   }
 
   public _setLanguage(lang: Language) {
