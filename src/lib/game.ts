@@ -38,7 +38,7 @@ export enum State {
 
 export class Game {
   public editor: EditorImpl;
-  private language: Writable<Language>;
+  public language: Writable<Language>;
   public tsLanguage: Readable<Parser.Language> =
     undefined as unknown as Readable<Parser.Language>;
   private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
