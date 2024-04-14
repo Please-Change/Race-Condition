@@ -6,6 +6,7 @@ import { Action, GameStatus, type Client, type Message } from "./socketing";
 import { createPowerUp } from "./powerup/create";
 import { StaticAnalysis } from "./analyze";
 import Parser from "web-tree-sitter";
+import _ from "lodash";
 import {
   writable,
   type Readable,
@@ -17,6 +18,13 @@ import {
 import type { Language, Problem } from "./types";
 import { ClickBottle } from "./bottle/clickRequired";
 import { LetterBottle } from "./bottle/letterRequired";
+import { ExiledVariables } from "./powerup/document/variable/exiled_letters";
+import type Monaco from "monaco-editor";
+import { SocialDistancing } from "./powerup/document/variable/social_distancing";
+
+const isVariableBased = (p: PowerUp) =>
+  p.type() === PowerUpType.SocialDistancing ||
+  p.type() === PowerUpType.ExiledLetters;
 
 const POSSIBLE_AUDIO = ["cash_register.mp3", "fun.wav", "intense.ogg"];
 
@@ -30,16 +38,21 @@ export enum State {
 
 export class Game {
   public editor: EditorImpl;
+  private language: Writable<Language>;
+  public tsLanguage: Readable<Parser.Language> =
+    undefined as unknown as Readable<Parser.Language>;
   private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
   public tree: Readable<Parser.Tree> =
     undefined as unknown as Readable<Parser.Tree>;
+  public variables: Readable<Parser.SyntaxNode[]> =
+    undefined as unknown as Readable<Parser.SyntaxNode[]>;
+  public markers: Monaco.editor.IMarkerData[] = [];
 
   public submitError: string;
 
-  private language: Writable<Language>;
   private problem: Problem;
-  public powerUps: Writable<PowerUp[]>;
-  public bottles: Writable<PowerUpBottle[]>;
+  public powerUps: Writable<PowerUp[]> = writable([]);
+  public bottles: Writable<PowerUpBottle[]> = writable([]);;
   public state: State;
   private client: Client;
   private wsListenerId: number | undefined;
@@ -50,10 +63,9 @@ export class Game {
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
     this.problem = problem;
-    this.powerUps = writable([]);
-    this.bottles = writable([]);
     this.state = State.Building;
-
+    this.problem = problem;
+    
     this.submitError = "";
     this.powerUpCountdown = 0;
 
@@ -73,7 +85,7 @@ export class Game {
       StaticAnalysis.forLanguage(lang).then(parser => _parser.set(parser));
     });
 
-    this.parser = readonly(_parser);
+    this.parser = derived(_parser, ([, p]) => p);
     this.tree = derived(
       [this.editor.sourceCode, this.parser],
       ([lines, parser]) =>
@@ -85,6 +97,41 @@ export class Game {
     );
 
     this.state = State.Running;
+    this.parser = derived(_parser, ([, p]) => p);
+    this.tsLanguage = derived(_parser, ([l]) => l);
+    this.tree = derived(
+      [this.editor.sourceCode, this.parser],
+      ([lines, parser]) => parser.parse(lines.join("\n")),
+    );
+
+    this.variables = derived(this.tree, tree =>
+      _.uniqBy(
+        StaticAnalysis.variables(
+          get(this.language),
+          get(this.tsLanguage),
+          tree,
+        ).map(a => a.captures[0].node),
+        node => node.text,
+      ),
+    );
+
+    const a = derived(
+      [this.variables, this.powerUps, this.editor.editor] as const,
+      ([_, powerUps, editor]) => {
+        return [powerUps, editor] as const;
+      },
+    );
+
+    a.subscribe(([powerUps, editor]) => {
+      powerUps.filter(isVariableBased).forEach(p => p.update(this));
+
+      const Monaco = this.editor.Monaco!;
+      Monaco.editor.setModelMarkers(
+        editor!.getModel()!,
+        "race-condition",
+        this.markers,
+      );
+    });
 
     window.requestAnimationFrame(() => {
       this.loop();
@@ -115,8 +162,21 @@ export class Game {
   }
 
   public update() {
+    this.powerUps.update(ps => ps.filter(p => {
+      if (p.update(this)) {
+        p.destroy(this);
+        return false;
+      }
+      return true;
+    }));
+
+    this.markers = [];
     this.powerUps.update(powerUps =>
       powerUps.filter(p => {
+        if (isVariableBased(p)) {
+          return true;
+        }
+
         if (p.update(this)) {
           p.destroy(this);
           return false;
@@ -176,6 +236,10 @@ export class Game {
     audio.play();
 
     p.apply(this);
+    this.powerUps.update(ps => {
+      ps.push(p);
+      return ps;
+    });
   }
 
   public sendPowerUp(p: PowerUpType) {
@@ -259,5 +323,16 @@ export class Game {
 
   public _setLanguage(lang: Language) {
     return this.language.set(lang);
+  }
+
+  public _applyExiled() {
+    let a = new ExiledVariables();
+    a.apply(this);
+    this.powerUps.update((ar) => [...ar, a]);
+  }
+  public _appltDistancing() {
+    let a = new SocialDistancing();
+    a.apply(this);
+    this.powerUps.update((ar) => [...ar, a]);
   }
 }

@@ -34,6 +34,8 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "@types/lodash": "^4.17.0",
+    "lodash": "^4.17.21",
     "monaco-editor": "^0.47.0",
     "svelte-markdown": "^0.4.1",
     "svelte-motion": "^0.12.2",

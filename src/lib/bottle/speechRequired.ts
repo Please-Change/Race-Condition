@@ -1,6 +1,6 @@
 import type { PowerUpType } from "@lib/powerup";
 import { PowerUpBottle } from ".";
-import { SpeechCapture } from "../speech";
+import { SpeechCapture } from "@lib/speech";
 
 export const ALLOWED_WORDS = [
   "banana",
