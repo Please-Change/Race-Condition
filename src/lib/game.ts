@@ -1,5 +1,5 @@
 import { PowerUp, PowerUpType } from "./powerup";
-import type { PowerUpBottle } from "./bottle";
+import { PowerUpBottle } from "./bottle";
 import { EditorImpl } from "./EditorImpl";
 import { SpeechBottle } from "./bottle/speechRequired";
 import { Action, GameStatus, type Client, type Message } from "./socketing";
@@ -15,6 +15,8 @@ import {
   get,
 } from "svelte/store";
 import type { Language, Problem } from "./types";
+import { ClickBottle } from "./bottle/clickRequired";
+import { LetterBottle } from "./bottle/letterRequired";
 
 export class Game {
   public editor: EditorImpl;
@@ -33,6 +35,8 @@ export class Game {
   private client: Client;
   private wsListenerId: number | undefined;
 
+  private powerUpCountdown: number;
+
   constructor(ws: Client, startLanguage: Language, problem: Problem) {
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
@@ -43,6 +47,7 @@ export class Game {
 
     this.submitError = "";
     this.submitting = false;
+    this.powerUpCountdown = 0;
 
     this.client = ws;
   }
@@ -53,6 +58,8 @@ export class Game {
     const _parser = writable(
       await StaticAnalysis.forLanguage(get(this.language)),
     );
+
+    this.powerUpCountdown = Math.floor(Math.random() * 300 + 150);
 
     this.language.subscribe(lang => {
       StaticAnalysis.forLanguage(lang).then(parser => _parser.set(parser));
@@ -79,9 +86,9 @@ export class Game {
 
     // Test code
 
-    const bottle = new SpeechBottle(false, PowerUpType.BadTrip);
-    this.addBottle(bottle);
-    console.log(bottle.label());
+    // const bottle = new SpeechBottle(false, PowerUpType.BadTrip);
+    // this.addBottle(bottle);
+    // console.log(bottle.label());
   }
 
   public destroy() {
@@ -117,6 +124,12 @@ export class Game {
         return true;
       }),
     );
+
+    this.powerUpCountdown--;
+    if (this.powerUpCountdown < 0) {
+      this.powerUpCountdown = Math.floor(Math.random() * 600 + 150);
+      this.genPowerUp();
+    }
   }
 
   public addBottle(b: PowerUpBottle) {
@@ -184,6 +197,25 @@ export class Game {
         this.loop();
       });
     }
+  }
+
+  private genPowerUp() {
+    const options = Object.values(PowerUpType);
+    const type = options[Math.floor(Math.random() * options.length)];
+    console.log({ type });
+
+    const forMe = Math.random() < 0.25;
+    const thing = Math.floor(Math.random() * 3);
+    let bottle: PowerUpBottle;
+    if (thing === 0) {
+      bottle = new ClickBottle(forMe, type);
+    } else if (thing === 1) {
+      bottle = new LetterBottle(forMe, type);
+    } else {
+      bottle = new SpeechBottle(forMe, type);
+    }
+
+    this.addBottle(bottle);
   }
 
   /// DEBUG

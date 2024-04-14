@@ -29,7 +29,7 @@ export enum PowerUpType {
   CharSwap = "Error",
   KeyboardSwap = "Swap",
   ExiledLetters = "NoE",
-  SocialDistancing = "TapToSpace",
+  SocialDistancing = "TabToSpace",
   ChangeLanguage = "SwapLang",
   KeyboardLag = "Lag",
   LightMode = "LightMode",
@@ -38,5 +38,5 @@ export enum PowerUpType {
   Blinded = "Blind",
   BadTrip = "RandomLocation",
   Hints = "Hint",
-  NoShortcuts = "NoShortcuts",
+  NoShortcuts = "NoShortcut",
 }
