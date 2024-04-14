@@ -3,7 +3,7 @@
 //   - 1 minute
 //   - Put a rectangle with low opacify over the code
 
-import { PowerUp } from "..";
+import { PowerUp, PowerUpType } from "..";
 
 export class LowPowerMode extends PowerUp {
   private time: number;
@@ -17,8 +17,8 @@ export class LowPowerMode extends PowerUp {
     this.div.style.width = "100vw";
     this.div.style.height = "100vh";
     this.div.style.background = "rgba(34,34,34,0.5)";
-    this.div.style.zIndex = "9"
-    this.div.style.pointerEvents = "none"
+    this.div.style.zIndex = "9";
+    this.div.style.pointerEvents = "none";
   }
 
   public update(): boolean {
@@ -29,7 +29,16 @@ export class LowPowerMode extends PowerUp {
   public init() {
     document.querySelector("main")!.appendChild(this.div);
   }
+
+  public type(): PowerUpType {
+    return PowerUpType.LowPowerMode;
+  }
+
   public destroy() {
     this.div.remove;
+  }
+
+  public icon(): string {
+    return PowerUpType.LowPowerMode;
   }
 }

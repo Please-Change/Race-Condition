@@ -6,6 +6,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
+import type { Language } from "./types";
 
 
 export class EditorImpl {
@@ -13,13 +14,13 @@ export class EditorImpl {
   public sourceCode: Writable<string[]> = writable([]);
 
   public divEl: HTMLDivElement;
-  private Monaco: typeof import("monaco-editor") | undefined;
+  public Monaco: typeof import("monaco-editor") | undefined;
 
   constructor() {
     this.divEl = document.createElement("div");
   }
 
-  public async init(language: Readable<StaticAnalysis.Language>) {
+  public async init(language: Readable<Language>) {
     this.Monaco = await import("monaco-editor");
 
     this.Monaco!.editor.defineTheme("racer", {
