@@ -32,7 +32,7 @@
   (window as any).game = game;
 </script>
 
-{#each $bottles as b}
+{#each $bottles as b (b.id)}
   <Bottle bottle={b} />
 {/each}
 <div class="grid grid-cols-2 w-full flex-grow">

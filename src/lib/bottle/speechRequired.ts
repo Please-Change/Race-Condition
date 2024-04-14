@@ -5,7 +5,7 @@ import { SpeechCapture } from "../speech";
 export const ALLOWED_WORDS = [
   "banana",
   "apple",
-  "fuck",
+  "f***",
   "you",
   "myself",
   "orange",
@@ -35,7 +35,7 @@ export class SpeechBottle extends PowerUpBottle {
     this.listenId = SpeechCapture.listenForWord(word => {
       if (this.words.length > 0) {
         const next = this.words[0];
-        if (word === next) {
+        if (word.toLowerCase() === next) {
           this.words.shift();
           if (this.words.length === 0) this.snatched = true;
         }
