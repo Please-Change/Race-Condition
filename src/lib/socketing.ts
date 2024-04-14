@@ -1,5 +1,5 @@
 import type { PowerUpType } from "./powerup";
-import type { Settings } from "./types";
+import type { Language, Settings } from "./types";
 
 export type Message =
   | {
@@ -14,7 +14,7 @@ export type Message =
       action: Action.UsePowerUp;
       data: PowerUpType;
     }
-  | { action: Action.Submit; data: string }
+  | { action: Action.Submit; data: { program: string; language: Language } }
   | {
       action: Action.StatusChanged;
       data:

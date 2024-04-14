@@ -6,11 +6,14 @@
   import { Game, State } from "../lib/game";
   import { Action, ReadyStatus, type Client } from "../lib/socketing";
   import type { Language, Problem } from "../lib/types";
-  import { derived, writable } from "svelte/store";
+  import { derived, get, writable } from "svelte/store";
 
   export let ws: Client;
   export let language: Language;
   export let problem: Problem;
+
+  console.log(language);
+  console.log(problem);
 
   SpeechCapture.init();
   SpeechCapture.listenForWord(console.log);
@@ -32,11 +35,13 @@
 
   const bottles = game.bottles;
   const powerups = game.powerUps;
+  const state = game.state;
+  const submitError = game.submitError;
 
   (window as any).game = game;
 </script>
 
-{#if game.state === State.Won}
+{#if $state === State.Won}
   <div class="w-full px-10">
     <button
       class="bg-green-900 text-center text-xl font-bold font-brand rounded-lg w-full"
@@ -47,7 +52,7 @@
       You Won!
     </button>
   </div>
-{:else if game.state === State.Lost}
+{:else if $state === State.Lost}
   <div class="w-full px-10">
     <button
       class="bg-red-900 text-center text-xl font-bold font-brand rounded-lg w-full"
@@ -93,7 +98,7 @@
         </div>
       </article>
       <div class="w-full px-6 flex gap-2">
-        {#if game.state === State.Submitting}<img
+        {#if $state === State.Submitting}<img
             alt="O"
             class="bg-white rounded-md aspect-square flex-none w-32"
             src="/loading.gif"
@@ -104,14 +109,14 @@
           on:click={() => {
             game.submit();
           }}
-          disabled={game.state === State.Submitting}
+          disabled={$state === State.Submitting}
           class="flex-auto font-brand font-bold text-2xl border-4 border-white hover:bg-white disabled:hover:bg-black disabled:hover:text-white hover:text-black rounded-md"
           >Submit
         </button>
       </div>
-      {#if game.submitError}
+      {#if $submitError != ""}
         <pre
-          class="mx-6 p-3 mt-3 rounded-md font-mono text-md bg-red-900">{game.submitError}</pre>
+          class="mx-6 p-3 mt-3 rounded-md font-mono text-md bg-red-900">{$submitError}</pre>
       {/if}
     </div>
   </div>

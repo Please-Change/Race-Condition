@@ -5,6 +5,7 @@ export interface Settings {
 
 export enum Problem {
   FizzBuzz = "FizzBuzz",
+  HelloWorld = "HelloWorld",
 }
 
 export enum Language {

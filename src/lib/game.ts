@@ -50,12 +50,12 @@ export class Game {
     undefined as unknown as Readable<Parser.SyntaxNode[]>;
   public markers: Monaco.editor.IMarkerData[] = [];
 
-  public submitError: string;
+  public submitError: Writable<string>;
 
   private problem: Problem;
   public powerUps: Writable<PowerUp[]> = writable([]);
   public bottles: Writable<PowerUpBottle[]> = writable([]);
-  public state: State;
+  public state: Writable<State>;
   private client: Client;
   private wsListenerId: number | undefined;
 
@@ -65,10 +65,10 @@ export class Game {
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
     this.problem = problem;
-    this.state = State.Building;
+    this.state = writable(State.Building);
     this.problem = problem;
 
-    this.submitError = "";
+    this.submitError = writable("");
     this.powerUpCountdown = 0;
 
     this.client = ws;
@@ -98,7 +98,7 @@ export class Game {
         }),
     );
 
-    this.state = State.Running;
+    this.state.set(State.Running);
     this.parser = derived(_parser, ([, p]) => p);
     this.tsLanguage = derived(_parser, ([l]) => l);
 
@@ -255,12 +255,15 @@ export class Game {
   }
 
   public submit() {
-    if (this.state !== State.Submitting && this.editor.editor) {
-      this.state = State.Submitting;
-      this.submitError = "";
+    if (get(this.state) !== State.Submitting && this.editor.editor) {
+      this.state.set(State.Submitting);
+      this.submitError.set("");
       this.client.send({
         action: Action.Submit,
-        data: get(this.editor.sourceCode).join("\n"),
+        data: {
+          program: get(this.editor.sourceCode).join("\n"),
+          language: get(this.language),
+        },
       });
     }
   }
@@ -274,20 +277,20 @@ export class Game {
         if (message.data.status === GameStatus.End) {
           if (message.data.success) {
             console.log("You WON!");
-            this.state = State.Won;
+            this.state.set(State.Won);
           } else {
             const audio = new Audio("/sounds/death.wav");
             audio.play();
-            this.state = State.Lost;
+            this.state.set(State.Lost);
             console.log("You lost :(");
           }
           this.destroy();
         }
         break;
       case Action.SubmitFailed:
-        if (this.state === State.Submitting) {
-          this.state = State.Running;
-          this.submitError = message.data;
+        if (get(this.state) === State.Submitting) {
+          this.state.set(State.Running);
+          this.submitError.set(message.data);
         }
     }
   }
@@ -295,7 +298,7 @@ export class Game {
   private loop() {
     this.update();
 
-    if (this.state !== State.Lost && this.state !== State.Won) {
+    if (get(this.state) !== State.Lost && get(this.state) !== State.Won) {
       window.requestAnimationFrame(() => {
         this.loop();
       });

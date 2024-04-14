@@ -9,11 +9,11 @@
   const ws = new Client("ws://localhost:5174/game");
 
   let playerCount = 0;
-  // let status = ReadyStatus.Waiting;
-  // let gameStatus = GameStatus.Pending;
+  let status = ReadyStatus.Waiting;
+  let gameStatus = GameStatus.Pending;
 
-  let status = ReadyStatus.Active;
-  let gameStatus = GameStatus.Active;
+  // let status = ReadyStatus.Active;
+  // let gameStatus = GameStatus.Active;
 
   let settings: Settings = {
     language: Language.JavaScript,
@@ -100,6 +100,6 @@
       >
     </div>
   {:else if gameStatus == GameStatus.Active}
-    <Game {ws} language={Language.JavaScript} problem={Problem.FizzBuzz} />
+    <Game {ws} language={settings.language} problem={settings.problem} />
   {/if}
 </main>
