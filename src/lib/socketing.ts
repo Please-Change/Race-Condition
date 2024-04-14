@@ -1,4 +1,5 @@
 import type { PowerUpType } from "./powerup";
+import type { Settings } from "./types";
 
 export type Message =
   | {
@@ -7,7 +8,7 @@ export type Message =
     }
   | {
       action: Action.ChangeSettings;
-      data: { language: string };
+      data: Settings;
     }
   | {
       action: Action.UsePowerUp;
@@ -21,7 +22,8 @@ export type Message =
         | { status: GameStatus.Active | GameStatus.Pending };
     }
   | { action: Action.StatusRequest }
-  | { action: Action.SubmitFailed; data: string };
+  | { action: Action.SubmitFailed; data: string }
+  | { action: Action.PlayerCountUpdate; data: number };
 
 export enum ReadyStatus {
   Ready = "ready",
@@ -32,11 +34,12 @@ export enum ReadyStatus {
 export enum Action {
   ChangeReady = "ready",
   ChangeSettings = "config",
-  UsePowerUp = "use",
+  PlayerCountUpdate = "players",
   StatusChanged = "status",
   StatusRequest = "status_req",
   Submit = "submit",
   SubmitFailed = "submit_failed",
+  UsePowerUp = "use",
 }
 
 export enum GameStatus {
@@ -83,7 +86,7 @@ export class Client {
     };
 
     this.socket.onerror = error => {
-      // alert(`[error] ${error}`);
+      console.log(`[error] ${error}`);
     };
   }
 

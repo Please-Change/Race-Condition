@@ -14,10 +14,10 @@ import {
   readonly,
   get,
 } from "svelte/store";
+import type { Language, Problem } from "./types";
 
 export class Game {
   public editor: EditorImpl;
-  private language: Writable<StaticAnalysis.Language>;
   private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
   public tree: Readable<Parser.Tree> =
     undefined as unknown as Readable<Parser.Tree>;
@@ -25,15 +25,18 @@ export class Game {
   public submitError: string;
   public submitting: boolean;
 
+  private language: Writable<Language>;
+  private problem: Problem;
   private powerUps: PowerUp[];
   public bottles: Writable<PowerUpBottle[]>;
   private running: boolean;
   private client: Client;
   private wsListenerId: number | undefined;
 
-  constructor(ws: Client, startLanguage: StaticAnalysis.Language) {
+  constructor(ws: Client, startLanguage: Language, problem: Problem) {
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
+    this.problem = problem;
     this.powerUps = [];
     this.bottles = writable([]);
     this.running = true;
@@ -189,7 +192,7 @@ export class Game {
     return get(this.tree);
   }
 
-  public _setLanguage(lang: StaticAnalysis.Language) {
+  public _setLanguage(lang: Language) {
     return this.language.set(lang);
   }
 }
