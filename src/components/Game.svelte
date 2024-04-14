@@ -32,7 +32,7 @@
   const powerups = game.powerUps;
   const state = game.state;
   const submitError = game.submitError;
-  const problemP = game.problem;
+  const task = game.task;
 
   (window as any).game = game;
 </script>
@@ -102,12 +102,13 @@
       >
         Task
       </div>
+      
       <article
         class="p-2 prose prose-headings:m-0 prose-headings:font-brand prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:text-white prose-invert"
       >
-        <SvelteMarkdown source={$problemP} />
+        <SvelteMarkdown source={$task} />
         <div class="p w-full">
-          {$languageP}
+          You are in <strong>{$languageP}</strong>.
         </div>
       </article>
       <div class="w-full px-6 flex gap-2">

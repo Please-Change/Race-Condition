@@ -14,7 +14,7 @@ import {
   derived,
   get,
 } from "svelte/store";
-import type { Language, Problem } from "./types";
+import { PROBLEMS, type Language, type Problem } from "./types";
 import { ClickBottle } from "./bottle/clickRequired";
 import { LetterBottle } from "./bottle/letterRequired";
 import { ExiledVariables } from "./powerup/document/variable/exiled_letters";
@@ -59,6 +59,8 @@ export class Game {
   private client: Client;
   private wsListenerId: number | undefined;
 
+  public task: Readable<string>;
+
   private powerUpCountdown: number;
 
   constructor(ws: Client, startLanguage: Language, problem: Problem) {
@@ -66,6 +68,7 @@ export class Game {
     this.language = writable(startLanguage);
     this.state = writable(State.Building);
     this.problem = writable(problem);
+    this.task = derived(this.problem, (prob) => PROBLEMS[prob]);
     this.submitError = writable("");
     this.powerUpCountdown = 0;
 
