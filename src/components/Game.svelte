@@ -18,16 +18,11 @@
   SpeechCapture.init();
   SpeechCapture.listenForWord(console.log);
 
-  const treeToString = writable("");
-
   const game = new Game(ws, language, problem);
   game
     .init()
     .then(async () => {
       console.log("Loaded GAME!");
-      game.tree.subscribe(tree => {
-        treeToString.set(tree.rootNode.toString());
-      });
     })
     .catch(console.error);
 
@@ -37,6 +32,7 @@
   const powerups = game.powerUps;
   const state = game.state;
   const submitError = game.submitError;
+  const problemP = game.problem;
 
   (window as any).game = game;
 </script>
@@ -69,14 +65,19 @@
   {/each}
 
   <div class="w-full">
-    <div class="flex border-4 gap-2 py-2 bg-black mb-6">
-      <div class="h-16"></div>
-      {#each $powerups as p (p.id)}
-        <div class="flex-none rounded-md bg-white h-16">
+    <div class="flex flex-row h-min-20 h-20 p-2 border-4 gap-2 bg-black mt-5 mb-8 relative content-center">
+      <div
+        class="bg-white text-black font-brand font-bold px-2 absolute text-md "
+        style="translate: -16px calc(-100% - 16px)"
+      >
+        Power-Ups
+      </div>
+      {#each $powerups as p, i (i)}
+        <div class="rounded-md bg-white h-14">
           <img
             alt=""
             src="/bottle_icons/{p.type()}.webp"
-            class="w-16 h-16"
+            class="w-14 h-14"
             style="image-rendering: pixelated;"
           />
         </div>
@@ -86,13 +87,25 @@
 
   <div class="grid grid-cols-2 w-full flex-grow">
     <div class="h-full w-full relative">
+      <div
+        class="bg-black text-white font-brand font-bold px-2 absolute text-md"
+        style="translate: 0 calc(-100% - 4px)"
+      >
+        Editor
+      </div>
       <GameEditor editor={game.editor} />
     </div>
-    <div class="overflow-y-auto">
+    <div class="h-full flex flex-col mt-auto relative">
+      <div
+        class="text-white font-brand font-bold px-2 absolute text-md"
+        style="translate: 0 calc(-100% - 4px)"
+      >
+        Task
+      </div>
       <article
         class="p-2 prose prose-headings:m-0 prose-headings:font-brand prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:text-white prose-invert"
       >
-        <SvelteMarkdown source={$treeToString} />
+        <SvelteMarkdown source={$problemP} />
         <div class="p w-full">
           {$languageP}
         </div>

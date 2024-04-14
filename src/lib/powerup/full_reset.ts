@@ -15,7 +15,7 @@ export class Reset extends PowerUp {
   }
 
   public type(): PowerUpType {
-    return PowerUpType.FullReset;
+    return PowerUpType.FullReset; 
   }
 
   public destroy(_: Game) {}

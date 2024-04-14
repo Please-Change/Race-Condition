@@ -45,6 +45,16 @@ export function createPowerUp(type: PowerUpType): PowerUp {
       return new NoShortcuts();
     case PowerUpType.LightMode:
       return new LightMode();
+    case PowerUpType.CharSwap:
+      return new CharacterSwap();
+    case PowerUpType.TabToSpace:
+      return new SwapTabsSpaces();
+    case PowerUpType.ChangeLanguage:
+      return new ChangeProgrammingLanguage();
+    case PowerUpType.ExiledLetters:
+      return new ExiledVariables();
+    case PowerUpType.SocialDistancing:
+      return new SocialDistancing();
   }
   return new PowerUp();
 }

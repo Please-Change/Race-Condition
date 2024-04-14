@@ -52,7 +52,7 @@ export class Game {
 
   public submitError: Writable<string>;
 
-  private problem: Problem;
+  public problem: Writable<Problem>;
   public powerUps: Writable<PowerUp[]> = writable([]);
   public bottles: Writable<PowerUpBottle[]> = writable([]);
   public state: Writable<State>;
@@ -64,10 +64,8 @@ export class Game {
   constructor(ws: Client, startLanguage: Language, problem: Problem) {
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
-    this.problem = problem;
     this.state = writable(State.Building);
-    this.problem = problem;
-
+    this.problem = writable(problem);
     this.submitError = writable("");
     this.powerUpCountdown = 0;
 
@@ -165,16 +163,6 @@ export class Game {
   }
 
   public update() {
-    this.powerUps.update(ps =>
-      ps.filter(p => {
-        if (p.update(this)) {
-          p.destroy(this);
-          return false;
-        }
-        return true;
-      }),
-    );
-
     this.markers = [];
     this.powerUps.update(powerUps =>
       powerUps.filter(p => {
@@ -194,14 +182,11 @@ export class Game {
       bottles.filter(b => {
         if (b.update()) {
           if (b.snatched) {
-            console.log(`snatched: ${b.label()}`);
             if (b.isForMe) {
               this.addPowerUp(b.powerUp);
             } else {
               this.sendPowerUp(b.powerUp);
             }
-          } else {
-            console.log(`destroyed: ${b.label()}`);
           }
           b.destroy();
           return false;

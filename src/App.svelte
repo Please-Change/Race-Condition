@@ -70,7 +70,7 @@
       >
     </div>
   {:else if status === ReadyStatus.Ready}
-    <div class="ml-6">
+    <div class="ml-6 flex flex-col">
       <h3 class="font-brand text-xl">{playerCount} active players</h3>
       <div>
         <select
@@ -82,7 +82,6 @@
             <option value={lang}>{lang}</option>
           {/each}
         </select>
-
         <select
           bind:value={settings.problem}
           on:change={updateSettings}
@@ -95,7 +94,7 @@
       </div>
       <button
         on:click={startMatch}
-        class="font-brand text-xl border border-white rounded-md p-2 mt-2"
+        class="font-brand text-xl border border-white rounded-md p-2 mt-2 justify-end"
         >Start match</button
       >
     </div>
