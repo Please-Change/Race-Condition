@@ -11,6 +11,9 @@ export class PowerUp {
 
   public apply(_: Game) {}
 
+  /**
+   * @returns Whether to destroy the powerup next tick.
+   */
   public update(_: Game): boolean {
     return false;
   }

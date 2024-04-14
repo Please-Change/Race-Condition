@@ -8,7 +8,6 @@ export enum Problem {
 }
 
 export enum Language {
-  C = "c",
   Cpp = "cpp",
   Go = "go",
   Python = "python",

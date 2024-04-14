@@ -14,7 +14,7 @@ export class EditorImpl {
   public sourceCode: Writable<string[]> = writable([]);
 
   public divEl: HTMLDivElement;
-  public Monaco: typeof import("monaco-editor") | undefined;
+  public Monaco: typeof monaco | undefined;
 
   constructor() {
     this.divEl = document.createElement("div");
