@@ -1,6 +1,7 @@
 <script lang="ts">
   import GameEditor from "./GameEditor.svelte";
   import Bottle from "./Bottle.svelte";
+  import Wall from "./Wall.svelte";
   import SvelteMarkdown from "svelte-markdown";
   import { SpeechCapture } from "../lib/speech";
   import { Game } from "../lib/game";
@@ -29,12 +30,15 @@
     .catch(console.error);
 
   const bottles = game.bottles;
+  const powerups = game.powerUps;
+
   (window as any).game = game;
 </script>
 
 {#each $bottles as b (b.id)}
   <Bottle bottle={b} />
 {/each}
+<Wall wall = {powerups}/>
 <div class="grid grid-cols-2 w-full flex-grow">
   <div class="h-full w-full relative">
     <GameEditor editor={game.editor} />

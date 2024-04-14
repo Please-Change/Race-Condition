@@ -7,10 +7,6 @@ export class PowerUp {
     return true;
   }
 
-  public json(): string {
-    return "";
-  }
-
   public type(): PowerUpType {
     throw new Error("Apples");
   }

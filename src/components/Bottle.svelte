@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { PowerUpBottle } from "../lib/bottle";
-  import { Motion, useAnimation } from "svelte-motion";
 
   export let bottle: PowerUpBottle;
 

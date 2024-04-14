@@ -29,7 +29,7 @@ export class Game {
 
   private language: Writable<Language>;
   private problem: Problem;
-  private powerUps: PowerUp[];
+  public powerUps: PowerUp[];
   public bottles: Writable<PowerUpBottle[]>;
   private running: boolean;
   private client: Client;
@@ -187,6 +187,10 @@ export class Game {
           this.submitError = message.data;
         }
     }
+  }
+
+  public GetPowerUps(): PowerUp[] {
+    return this.powerUps
   }
 
   private loop() {
