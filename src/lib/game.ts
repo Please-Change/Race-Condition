@@ -6,29 +6,36 @@ import { Action, GameStatus, type Client, type Message } from "./socketing";
 import { createPowerUp } from "./powerup/create";
 import { StaticAnalysis } from "./analyze";
 import Parser from "web-tree-sitter";
-import { writable, type Readable, type Writable, derived, readonly, get } from "svelte/store";
+import {
+  writable,
+  type Readable,
+  type Writable,
+  derived,
+  readonly,
+  get,
+} from "svelte/store";
 
 export class Game {
   public editor: EditorImpl;
   private language: Writable<StaticAnalysis.Language>;
   private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
-  public tree: Readable<Parser.Tree> = undefined as unknown as Readable<Parser.Tree>;
+  public tree: Readable<Parser.Tree> =
+    undefined as unknown as Readable<Parser.Tree>;
 
   public submitError: string;
   public submitting: boolean;
 
   private powerUps: PowerUp[];
-  private bottles: PowerUpBottle[];
+  public bottles: Writable<PowerUpBottle[]>;
   private running: boolean;
   private client: Client;
   private wsListenerId: number | undefined;
 
   constructor(ws: Client, startLanguage: StaticAnalysis.Language) {
-
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
     this.powerUps = [];
-    this.bottles = [];
+    this.bottles = writable([]);
     this.running = true;
 
     this.submitError = "";
@@ -40,19 +47,24 @@ export class Game {
   public async init() {
     await this.editor.init(this.language);
     await StaticAnalysis.init();
-    const _parser = writable(await StaticAnalysis.forLanguage(get(this.language)));
+    const _parser = writable(
+      await StaticAnalysis.forLanguage(get(this.language)),
+    );
 
     this.language.subscribe(lang => {
-      StaticAnalysis.forLanguage(lang)
-        .then(parser => _parser.set(parser))
+      StaticAnalysis.forLanguage(lang).then(parser => _parser.set(parser));
     });
 
     this.parser = readonly(_parser);
-    this.tree = derived([this.editor.sourceCode, this.parser], ([lines, parser]) => parser.parse((_, position) => {
-      let line = lines[position!.row];
-      if (line) return line.slice(position!.column);
-      return "";
-    }));
+    this.tree = derived(
+      [this.editor.sourceCode, this.parser],
+      ([lines, parser]) =>
+        parser.parse((_, position) => {
+          let line = lines[position!.row];
+          if (line) return line.slice(position!.column);
+          return "";
+        }),
+    );
 
     window.requestAnimationFrame(() => {
       this.loop();
@@ -64,9 +76,9 @@ export class Game {
 
     // Test code
 
-    // const bottle = new SpeechBottle(false, PowerUpType.None);
-    // this.addBottle(bottle);
-    // console.log(bottle.label());
+    const bottle = new SpeechBottle(false, PowerUpType.BadTrip);
+    this.addBottle(bottle);
+    console.log(bottle.label());
   }
 
   public destroy() {
@@ -76,41 +88,46 @@ export class Game {
 
   public update() {
     this.powerUps = this.powerUps.filter(p => {
-      if (p.update(this.editor)) {
-        p.destroy(this.editor);
+      if (p.update(this)) {
+        p.destroy(this);
         return false;
       }
       return true;
     });
 
-    this.bottles = this.bottles.filter(b => {
-      if (b.update()) {
-        if (b.snatched) {
-          console.log(`snatched: ${b.label()}`);
-          if (b.isForMe) {
-            this.addPowerUp(b.powerUp);
+    this.bottles.update(bottles =>
+      bottles.filter(b => {
+        if (b.update()) {
+          if (b.snatched) {
+            console.log(`snatched: ${b.label()}`);
+            if (b.isForMe) {
+              this.addPowerUp(b.powerUp);
+            } else {
+              this.sendPowerUp(b.powerUp);
+            }
           } else {
-            this.sendPowerUp(b.powerUp);
+            console.log(`destroyed: ${b.label()}`);
           }
-        } else {
-          console.log(`destroyed: ${b.label()}`);
+          b.destroy();
+          return false;
         }
-        b.destroy();
-        return false;
-      }
-      return true;
-    });
+        return true;
+      }),
+    );
   }
 
   public addBottle(b: PowerUpBottle) {
     b.init();
-    this.bottles.push(b);
+    this.bottles.update(bottles => {
+      bottles.push(b);
+      return bottles;
+    });
   }
 
   public addPowerUp(type: PowerUpType) {
     const p = createPowerUp(type);
 
-    p.apply(this.editor);
+    p.apply(this);
     this.powerUps.push(p);
   }
 
@@ -166,13 +183,12 @@ export class Game {
     }
   }
 
-
   /// DEBUG
 
   public _tree() {
     return get(this.tree);
   }
-  
+
   public _setLanguage(lang: StaticAnalysis.Language) {
     return this.language.set(lang);
   }

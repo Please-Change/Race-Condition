@@ -83,7 +83,7 @@ export class Client {
     };
 
     this.socket.onerror = error => {
-      alert(`[error] ${error}`);
+      // alert(`[error] ${error}`);
     };
   }
 
