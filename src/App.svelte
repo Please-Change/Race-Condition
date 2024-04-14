@@ -29,7 +29,7 @@
   {#each $bottles as b}
     <Bottle bottle={b} />
   {/each}
-  <h2 class="font-brand text-2xl font-bold">Race Condition</h2>
+  <h2 class="font-brand text-2xl font-bold ml-16">Race Condition</h2>
   <div class="grid grid-cols-2 w-full flex-grow">
     <div class="h-full w-full relative">
       <GameEditor editor={game.editor} />
