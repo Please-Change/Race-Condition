@@ -12,7 +12,7 @@ export class PowerUp {
   }
 
   public type(): PowerUpType {
-    return PowerUpType.None;
+    throw new Error("Apples");
   }
 
   public destroy(_: Game) {}
@@ -25,19 +25,18 @@ export class PowerUp {
 // Alphabetically sorted variable names
 
 export enum PowerUpType {
-  None,
-  VoiceToText,
-  CharSwap,
-  KeyboardSwap,
-  ExiledLetters,
-  SocialDistancing,
-  ChangeLanguage,
-  KeyboardLag,
-  LightMode,
-  LowPowerMode,
-  FullReset,
-  Blinded,
-  BadTrip,
-  Hints,
-  NoShortcuts,
+  VoiceToText = "Mic",
+  CharSwap = "Error",
+  KeyboardSwap = "Swap",
+  ExiledLetters = "NoE",
+  SocialDistancing = "TapToSpace",
+  ChangeLanguage = "SwapLang",
+  KeyboardLag = "Lag",
+  LightMode = "LightMode",
+  LowPowerMode = "LowBat",
+  FullReset = "Reset",
+  Blinded = "Blind",
+  BadTrip = "RandomLocation",
+  Hints = "Hint",
+  NoShortcuts = "NoShortcuts",
 }

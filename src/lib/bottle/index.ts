@@ -11,8 +11,8 @@ export class PowerUpBottle {
     this.powerUp = powerUp;
     this.snatched = false;
 
-    const xpos = Math.floor(Math.random() * (window.innerHeight - 20)) + 20;
-    this.position = [xpos, 0];
+    const xpos = Math.floor(Math.random() * (window.innerWidth - 20)) + 20;
+    this.position = [xpos, -100];
   }
 
   public update(): boolean {
@@ -29,8 +29,6 @@ export class PowerUpBottle {
   }
 
   public icon(): string {
-    // return this.powerUp.icon();
-    // TODO
-    return "";
+    return `/bottle_icons/${this.powerUp}.webp`;
   }
 }
