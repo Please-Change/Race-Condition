@@ -6,7 +6,7 @@
   import { Action, Client, GameStatus, ReadyStatus } from "./lib/socketing";
   import { Language, Problem, type Settings } from "./lib/types";
 
-  const ws = new Client("ws://localhost:5174");
+  const ws = new Client("ws://localhost:5174/game");
 
   let playerCount = 0;
   let status = ReadyStatus.Waiting;

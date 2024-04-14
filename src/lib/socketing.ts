@@ -34,12 +34,12 @@ export enum ReadyStatus {
 export enum Action {
   ChangeReady = "ready",
   ChangeSettings = "config",
-  UsePowerUp = "use",
+  PlayerCountUpdate = "players",
   StatusChanged = "status",
   StatusRequest = "status_req",
   Submit = "submit",
   SubmitFailed = "submit_failed",
-  PlayerCountUpdate = "players",
+  UsePowerUp = "use",
 }
 
 export enum GameStatus {
