@@ -1,17 +1,22 @@
 import type { Game } from "@lib/game";
 
 export class PowerUp {
+  public id: number;
+  private static nextId = 0;
+
+  constructor() {
+    this.id = PowerUp.nextId;
+    PowerUp.nextId++;
+  }
+
   public apply(_: Game) {}
 
   public update(_: Game): boolean {
-    return true;
-  }
-
-  public json(): string {
-    return "";
+    return false;
   }
 
   public type(): PowerUpType {
+    return PowerUpType.BadTrip;
     throw new Error("Apples");
   }
 

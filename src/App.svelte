@@ -9,11 +9,11 @@
   const ws = new Client("ws://localhost:5174/game");
 
   let playerCount = 0;
-  let status = ReadyStatus.Waiting;
-  let gameStatus = GameStatus.Pending;
+  // let status = ReadyStatus.Waiting;
+  // let gameStatus = GameStatus.Pending;
 
-  // let status = ReadyStatus.Active;
-  // let gameStatus = GameStatus.Active;
+  let status = ReadyStatus.Active;
+  let gameStatus = GameStatus.Active;
 
   let settings: Settings = {
     language: Language.JavaScript,
@@ -32,6 +32,7 @@
         break;
       case Action.ChangeReady:
         status = message.data;
+        if (status === ReadyStatus.Waiting) gameStatus = GameStatus.Pending;
         break;
       case Action.ChangeSettings:
         settings = message.data;
