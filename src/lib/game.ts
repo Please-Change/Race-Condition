@@ -149,6 +149,7 @@ export class Game {
     // const bottle = new SpeechBottle(false, PowerUpType.BadTrip);
     // this.addBottle(bottle);
     // console.log(bottle.label());
+    this.addPowerUp(PowerUpType.NoShortcuts);
   }
 
   public destroy() {

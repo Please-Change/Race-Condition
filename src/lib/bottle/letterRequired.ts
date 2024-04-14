@@ -1,7 +1,7 @@
 import type { PowerUpType } from "@lib/powerup";
 import { PowerUpBottle } from ".";
 
-const ALLOWED_LETTERS =
+export const ALLOWED_LETTERS =
   "abcdefghijklmnopqrstuvwxyz1234567890!\"£$%^&*()'#~]}{[-_/?;:.>'@".split("");
 
 export class LetterBottle extends PowerUpBottle {
@@ -41,7 +41,7 @@ export class LetterBottle extends PowerUpBottle {
   }
 }
 
-function randomLetter() {
+export function randomLetter() {
   const i = Math.floor(Math.random() * (ALLOWED_LETTERS.length - 1));
   return ALLOWED_LETTERS[i];
 }

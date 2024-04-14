@@ -3,21 +3,39 @@
 //   - 1 minute
 //   - Stop recognising ctrl key
 
-import { Game } from "@lib/game";
+import type { Game } from "@lib/game";
 import { PowerUp, PowerUpType } from "..";
 import { get } from "svelte/store";
-import { LetterBottle } from "@lib/bottle/letterRequired";
+import { Range } from "monaco-editor";
 
-export class No_Shortcuts extends PowerUp {
-  public apply(_: Game) {}
+export class NoShortcuts extends PowerUp {
+  private time: number;
+  private stopAllKeys: (e: KeyboardEvent) => void;
+
+  constructor() {
+    super();
+    this.time = 60 * 60;
+    this.stopAllKeys = e => {
+      if (e.altKey || e.ctrlKey) {
+        e.preventDefault();
+      }
+    };
+  }
+
+  public update(): boolean {
+    this.time--;
+    return this.time < 0;
+  }
+
+  public apply() {
+    window.addEventListener("keypress", this.stopAllKeys);
+  }
 
   public type(): PowerUpType {
     return PowerUpType.NoShortcuts;
   }
 
-  public destroy(_: Game) {}
-
-  public icon(): string {
-    return PowerUpType.NoShortcuts;
+  public destroy() {
+    window.removeEventListener("keypress", this.stopAllKeys);
   }
 }

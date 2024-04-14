@@ -24,10 +24,6 @@ export class PowerUp {
   }
 
   public destroy(_: Game) {}
-
-  public icon(): string {
-    return "";
-  }
 }
 
 // Alphabetically sorted variable names

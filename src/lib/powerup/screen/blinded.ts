@@ -26,7 +26,7 @@ export class BlackScreen extends PowerUp {
     return this.time < 0;
   }
 
-  public init() {
+  public apply() {
     document.querySelector("main")!.appendChild(this.div);
   }
 
@@ -35,7 +35,7 @@ export class BlackScreen extends PowerUp {
   }
 
   public destroy() {
-    this.div.remove;
+    this.div.remove();
   }
   public icon(): string {
     return PowerUpType.Blinded;
