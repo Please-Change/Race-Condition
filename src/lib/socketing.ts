@@ -68,7 +68,7 @@ export class Client {
       // TODO: Check event.data is json
       console.log(`[message] [received] ${event.data}`);
       for (const l of Object.values(this.listeners)) {
-        const handled = l(event.data as Message);
+        const handled = l(JSON.parse(event.data) as Message);
         if (handled) break;
       }
     };

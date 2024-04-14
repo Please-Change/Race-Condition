@@ -28,9 +28,6 @@
       case Action.StatusChanged:
         if (status === ReadyStatus.Ready || status === ReadyStatus.Active) {
           gameStatus = message.data.status;
-          if (gameStatus === GameStatus.Active) {
-            status = ReadyStatus.Active;
-          }
         }
         break;
       case Action.ChangeReady:
@@ -43,7 +40,6 @@
   });
 
   function joinMatch() {
-    status = ReadyStatus.Ready;
     ws.send({ action: Action.ChangeReady, data: ReadyStatus.Ready });
   }
 
@@ -102,7 +98,7 @@
         >Start match</button
       >
     </div>
-  {:else}
+  {:else if gameStatus == GameStatus.Active}
     <Game {ws} language={Language.JavaScript} problem={Problem.FizzBuzz} />
   {/if}
 </main>
