@@ -20,6 +20,14 @@ import { LetterBottle } from "./bottle/letterRequired";
 
 const POSSIBLE_AUDIO = ["cash_register.mp3", "fun.wav", "intense.ogg"];
 
+export enum State {
+  Building,
+  Running,
+  Submitting,
+  Won,
+  Lost,
+}
+
 export class Game {
   public editor: EditorImpl;
   private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
@@ -27,13 +35,12 @@ export class Game {
     undefined as unknown as Readable<Parser.Tree>;
 
   public submitError: string;
-  public submitting: boolean;
 
   private language: Writable<Language>;
   private problem: Problem;
   public powerUps: Writable<PowerUp[]>;
   public bottles: Writable<PowerUpBottle[]>;
-  private running: boolean;
+  public state: State;
   private client: Client;
   private wsListenerId: number | undefined;
 
@@ -45,10 +52,9 @@ export class Game {
     this.problem = problem;
     this.powerUps = writable([]);
     this.bottles = writable([]);
-    this.running = true;
+    this.state = State.Building;
 
     this.submitError = "";
-    this.submitting = false;
     this.powerUpCountdown = 0;
 
     this.client = ws;
@@ -78,6 +84,8 @@ export class Game {
         }),
     );
 
+    this.state = State.Running;
+
     window.requestAnimationFrame(() => {
       this.loop();
     });
@@ -94,6 +102,14 @@ export class Game {
   }
 
   public destroy() {
+    get(this.powerUps).map(p => {
+      p.destroy(this);
+    });
+
+    get(this.bottles).map(b => {
+      b.destroy();
+    });
+
     this.editor.dispose();
     if (this.wsListenerId) this.client.removeListener(this.wsListenerId);
   }
@@ -149,7 +165,6 @@ export class Game {
 
     const sound =
       POSSIBLE_AUDIO[Math.floor(Math.random() * POSSIBLE_AUDIO.length)];
-    console.log(this.powerUps);
 
     this.powerUps.update(powerUps => {
       powerUps.push(p);
@@ -171,8 +186,8 @@ export class Game {
   }
 
   public submit() {
-    if (!this.submitting && this.editor.editor) {
-      this.submitting = true;
+    if (this.state !== State.Submitting && this.editor.editor) {
+      this.state = State.Submitting;
       this.submitError = "";
       this.client.send({
         action: Action.Submit,
@@ -188,18 +203,21 @@ export class Game {
         break;
       case Action.StatusChanged:
         if (message.data.status === GameStatus.End) {
-          // TODO: end animation + destroy
-
           if (message.data.success) {
             console.log("You WON!");
+            this.state = State.Won;
           } else {
+            const audio = new Audio("/sounds/death.wav");
+            audio.play();
+            this.state = State.Lost;
             console.log("You lost :(");
           }
+          this.destroy();
         }
         break;
       case Action.SubmitFailed:
-        if (this.submitting) {
-          this.submitting = false;
+        if (this.state === State.Submitting) {
+          this.state = State.Running;
           this.submitError = message.data;
         }
     }
@@ -208,7 +226,7 @@ export class Game {
   private loop() {
     this.update();
 
-    if (this.running) {
+    if (this.state !== State.Lost && this.state !== State.Won) {
       window.requestAnimationFrame(() => {
         this.loop();
       });
@@ -218,7 +236,6 @@ export class Game {
   private genPowerUp() {
     const options = Object.values(PowerUpType);
     const type = options[Math.floor(Math.random() * options.length)];
-    console.log({ type });
 
     const forMe = true || Math.random() < 0.25;
     const thing = Math.floor(Math.random() * 3);

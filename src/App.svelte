@@ -32,6 +32,7 @@
         break;
       case Action.ChangeReady:
         status = message.data;
+        if (status === ReadyStatus.Waiting) gameStatus = GameStatus.Pending;
         break;
       case Action.ChangeSettings:
         settings = message.data;
