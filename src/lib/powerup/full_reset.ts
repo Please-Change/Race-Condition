@@ -4,13 +4,14 @@
 
 import { Game } from "@lib/game";
 import { PowerUp, PowerUpType } from ".";
+import { get } from "svelte/store";
 
 export class Reset extends PowerUp {
   public apply(game: Game) {
-    for (let index = 0; index < game.powerUps.length; index++) {
-      game.powerUps[index].destroy(game);
+    for (const p of get(game.powerUps)) {
+      p.destroy(game);
     }
-    game.powerUps = [];
+    game.powerUps.set([]);
   }
 
   public type(): PowerUpType {

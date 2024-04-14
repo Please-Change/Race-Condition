@@ -18,6 +18,8 @@ import type { Language, Problem } from "./types";
 import { ClickBottle } from "./bottle/clickRequired";
 import { LetterBottle } from "./bottle/letterRequired";
 
+const POSSIBLE_AUDIO = ["cash_register.mp3", "fun.wav", "intense.ogg"];
+
 export class Game {
   public editor: EditorImpl;
   private parser: Readable<Parser> = undefined as unknown as Readable<Parser>;
@@ -29,7 +31,7 @@ export class Game {
 
   private language: Writable<Language>;
   private problem: Problem;
-  public powerUps: PowerUp[];
+  public powerUps: Writable<PowerUp[]>;
   public bottles: Writable<PowerUpBottle[]>;
   private running: boolean;
   private client: Client;
@@ -41,7 +43,7 @@ export class Game {
     this.editor = new EditorImpl();
     this.language = writable(startLanguage);
     this.problem = problem;
-    this.powerUps = [];
+    this.powerUps = writable([]);
     this.bottles = writable([]);
     this.running = true;
 
@@ -97,13 +99,15 @@ export class Game {
   }
 
   public update() {
-    this.powerUps = this.powerUps.filter(p => {
-      if (p.update(this)) {
-        p.destroy(this);
-        return false;
-      }
-      return true;
-    });
+    this.powerUps.update(powerUps =>
+      powerUps.filter(p => {
+        if (p.update(this)) {
+          p.destroy(this);
+          return false;
+        }
+        return true;
+      }),
+    );
 
     this.bottles.update(bottles =>
       bottles.filter(b => {
@@ -143,8 +147,20 @@ export class Game {
   public addPowerUp(type: PowerUpType) {
     const p = createPowerUp(type);
 
+    const sound =
+      POSSIBLE_AUDIO[Math.floor(Math.random() * POSSIBLE_AUDIO.length)];
+    console.log(this.powerUps);
+
+    this.powerUps.update(powerUps => {
+      powerUps.push(p);
+      return powerUps;
+    });
+
+    const audio = new Audio(`/sounds/${sound}`);
+
+    audio.play();
+
     p.apply(this);
-    this.powerUps.push(p);
   }
 
   public sendPowerUp(p: PowerUpType) {
@@ -189,10 +205,6 @@ export class Game {
     }
   }
 
-  public GetPowerUps(): PowerUp[] {
-    return this.powerUps
-  }
-
   private loop() {
     this.update();
 
@@ -208,7 +220,7 @@ export class Game {
     const type = options[Math.floor(Math.random() * options.length)];
     console.log({ type });
 
-    const forMe = Math.random() < 0.25;
+    const forMe = true || Math.random() < 0.25;
     const thing = Math.floor(Math.random() * 3);
     let bottle: PowerUpBottle;
     if (thing === 0) {
