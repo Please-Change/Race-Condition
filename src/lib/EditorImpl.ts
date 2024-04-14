@@ -1,6 +1,5 @@
 import type monaco from "monaco-editor";
 import { get, writable, type Readable, type Writable } from "svelte/store";
-import type { StaticAnalysis } from "./analyze";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'

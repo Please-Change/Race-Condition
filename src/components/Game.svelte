@@ -28,6 +28,8 @@
     })
     .catch(console.error);
 
+  const languageP = game.language;
+
   const bottles = game.bottles;
   const powerups = game.powerUps;
 
@@ -86,6 +88,9 @@
         class="p-2 prose prose-headings:m-0 prose-headings:font-brand prose-p:my-1 prose-li:my-0 prose-ul:my-1 prose-ol:my-1 prose-headings:text-white prose-invert"
       >
         <SvelteMarkdown source={$treeToString} />
+        <div class="p w-full">
+          {$languageP}
+        </div>
       </article>
       <div class="w-full px-6 flex gap-2">
         {#if game.state === State.Submitting}<img

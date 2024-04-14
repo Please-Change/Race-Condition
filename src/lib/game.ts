@@ -21,6 +21,9 @@ import { LetterBottle } from "./bottle/letterRequired";
 import { ExiledVariables } from "./powerup/document/variable/exiled_letters";
 import type Monaco from "monaco-editor";
 import { SocialDistancing } from "./powerup/document/variable/social_distancing";
+import { ChangeProgrammingLanguage } from "./powerup/document/change_language";
+import { CharacterSwap } from "./powerup/document/char_swap";
+import { SwapTabsSpaces } from "./powerup/document/swap_tabs_spaces";
 
 const isVariableBased = (p: PowerUp) =>
   p.type() === PowerUpType.SocialDistancing ||
@@ -328,6 +331,12 @@ export class Game {
     return this.language.set(lang);
   }
 
+  public _changeLanguage() {
+    let a = new ChangeProgrammingLanguage();
+    a.apply(this);
+    this.powerUps.update((ar) => [...ar, a]);
+  }
+
   public _applyExiled() {
     let a = new ExiledVariables();
     a.apply(this);
@@ -335,6 +344,16 @@ export class Game {
   }
   public _appltDistancing() {
     let a = new SocialDistancing();
+    a.apply(this);
+    this.powerUps.update((ar) => [...ar, a]);
+  }
+  public _characterSwap() {
+    let a = new CharacterSwap();
+    a.apply(this);
+    this.powerUps.update((ar) => [...ar, a]);
+  }
+  public _swapTabsSpaces() {
+    let a = new SwapTabsSpaces();
     a.apply(this);
     this.powerUps.update((ar) => [...ar, a]);
   }

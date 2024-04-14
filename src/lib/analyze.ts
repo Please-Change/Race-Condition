@@ -99,6 +99,10 @@ export namespace StaticAnalysis {
   }
 
   export function variables(lang_id: Language, lang: Parser.Language, ast: Parser.Tree) {
-    return lang.query(LANGUAGES[lang_id].variables).matches(ast.rootNode)
+    try {
+      return lang.query(LANGUAGES[lang_id].variables).matches(ast.rootNode)
+    } catch(e) {
+      return []
+    }
   }
 }

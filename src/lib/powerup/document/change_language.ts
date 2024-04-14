@@ -6,7 +6,7 @@ import type { Game } from "@lib/game";
 import { PowerUp, PowerUpType } from "..";
 import { StaticAnalysis } from "@lib/analyze";
 
-export class SwapProgrammingLanguage extends PowerUp {
+export class ChangeProgrammingLanguage extends PowerUp {
   private applied = false;
 
   public apply(g: Game): void {}
