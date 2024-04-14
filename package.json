@@ -35,6 +35,7 @@
   "dependencies": {
     "monaco-editor": "^0.47.0",
     "svelte-markdown": "^0.4.1",
+    "svelte-motion": "^0.12.2",
     "web-tree-sitter": "^0.22.4"
   }
 }
